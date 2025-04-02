@@ -10,20 +10,20 @@ pipeline {
         
         stage('Set up Python') {
             steps {
-                sh 'python -m pip install --upgrade pip'
+                sh 'python3 -m pip install --upgrade pip'
                 sh 'pip install -r requirements.txt'
             }
         }
         
         stage('Run Tests') {
             steps {
-                sh 'python -m pytest test_hello_world.py -v'
+                sh 'python3 -m pytest test_hello_world.py -v'
             }
         }
         
         stage('Run Application') {
             steps {
-                sh 'python hello_world.py'
+                sh 'python3 hello_world.py'
             }
         }
     }
