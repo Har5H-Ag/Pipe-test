@@ -2,9 +2,8 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
-
 trigger:
-  - main  # Or the branch you want to trigger the pipeline on
+  - main
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -13,18 +12,12 @@ variables:
   VENV_DIR: 'venv'
 
 stages:
-  - stage: Checkout
-    displayName: 'Checkout Code'
+  - stage: BuildAndTest
     jobs:
-      - job: Checkout
+      - job: BuildAndTestJob
         steps:
           - checkout: self
 
-  - stage: SetupPython
-    displayName: 'Set up Python'
-    jobs:
-      - job: Setup
-        steps:
           - task: UsePythonVersion@0
             inputs:
               versionSpec: '3.x'
@@ -32,27 +25,25 @@ stages:
 
           - script: |
               python -m venv $(VENV_DIR)
-              source $(VENV_DIR)/bin/activate
-              python -m pip install --upgrade pip
-              pip install -r requirements.txt
-            displayName: 'Install dependencies'
-
-  - stage: RunTests
-    displayName: 'Run Tests'
-    jobs:
-      - job: Tests
-        steps:
-          - script: |
-              source $(VENV_DIR)/bin/activate
-              python -m pytest test_hello_world.py -v
-            displayName: 'Run Pytest'
+              ./$(VENV_DIR)/bin/pip install --upgrade pip
+              ./$(VENV_DIR)/bin/pip install -r requirements.txt
+              ./$(VENV_DIR)/bin/python -m pytest test_hello_world.py -v
+            displayName: 'Set up venv, install deps, run tests'
 
   - stage: RunApp
-    displayName: 'Run Application'
+    dependsOn: BuildAndTest
     jobs:
-      - job: Run
+      - job: RunAppJob
         steps:
+          - checkout: self
+
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.x'
+              addToPath: true
+
           - script: |
-              source $(VENV_DIR)/bin/activate
-              python hello_world.py
+              python -m venv $(VENV_DIR)
+              ./$(VENV_DIR)/bin/pip install -r requirements.txt
+              ./$(VENV_DIR)/bin/python hello_world.py
             displayName: 'Run hello_world.py'
