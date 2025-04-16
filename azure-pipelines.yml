@@ -1,0 +1,58 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  - main  # Or the branch you want to trigger the pipeline on
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  VENV_DIR: 'venv'
+
+stages:
+  - stage: Checkout
+    displayName: 'Checkout Code'
+    jobs:
+      - job: Checkout
+        steps:
+          - checkout: self
+
+  - stage: SetupPython
+    displayName: 'Set up Python'
+    jobs:
+      - job: Setup
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.x'
+              addToPath: true
+
+          - script: |
+              python -m venv $(VENV_DIR)
+              source $(VENV_DIR)/bin/activate
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+            displayName: 'Install dependencies'
+
+  - stage: RunTests
+    displayName: 'Run Tests'
+    jobs:
+      - job: Tests
+        steps:
+          - script: |
+              source $(VENV_DIR)/bin/activate
+              python -m pytest test_hello_world.py -v
+            displayName: 'Run Pytest'
+
+  - stage: RunApp
+    displayName: 'Run Application'
+    jobs:
+      - job: Run
+        steps:
+          - script: |
+              source $(VENV_DIR)/bin/activate
+              python hello_world.py
+            displayName: 'Run hello_world.py'
