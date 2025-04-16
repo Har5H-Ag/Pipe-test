@@ -2,6 +2,7 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+
 trigger:
   - main
 
@@ -10,6 +11,7 @@ pool:
 
 variables:
   VENV_DIR: 'venv'
+  MY_VAR: 'default_value'  # Add a sample variable
 
 stages:
   - stage: BuildAndTest
@@ -24,6 +26,7 @@ stages:
               addToPath: true
 
           - script: |
+              echo "MY_VAR is: $(MY_VAR)"  # Print the MY_VAR value
               python -m venv $(VENV_DIR)
               ./$(VENV_DIR)/bin/pip install --upgrade pip
               ./$(VENV_DIR)/bin/pip install -r requirements.txt
@@ -43,6 +46,7 @@ stages:
               addToPath: true
 
           - script: |
+              echo "MY_VAR is: $(MY_VAR)"  # Print the MY_VAR value
               python -m venv $(VENV_DIR)
               ./$(VENV_DIR)/bin/pip install -r requirements.txt
               ./$(VENV_DIR)/bin/python hello_world.py
