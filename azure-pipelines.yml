@@ -11,7 +11,6 @@ pool:
 
 variables:
   VENV_DIR: 'venv'
-  $(MY_VAR): 'default_value'  # Add a sample variable
 
 stages:
   - stage: BuildAndTest
