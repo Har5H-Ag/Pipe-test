@@ -2,7 +2,6 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
-# Azure DevOps Pipeline for Python with Code Coverage
 # Azure DevOps Pipeline for Python with Code Coverage and Artifacts
 
 trigger:
@@ -28,15 +27,15 @@ stages:
 
           - script: |
               echo "MY_VAR is: $(MY_VAR)"
-                  python -m venv $(VENV_DIR)
-                  ./$(VENV_DIR)/bin/pip install --upgrade pip
-                  ./$(VENV_DIR)/bin/pip install -r requirements.txt
-                  ./$(VENV_DIR)/bin/pip install pytest pytest-cov coverage
-                  ./$(VENV_DIR)/bin/python -m pytest --cov=. \
-                    --cov-report=xml:$(Build.SourcesDirectory)/coverage.xml \
-                    --cov-report=html:$(Build.SourcesDirectory)/htmlcov \
-                    -v
-                  displayName: 'Set up venv, install deps, run tests with coverage'
+              python -m venv $(VENV_DIR)
+              ./$(VENV_DIR)/bin/pip install --upgrade pip
+              ./$(VENV_DIR)/bin/pip install -r requirements.txt
+              ./$(VENV_DIR)/bin/pip install pytest pytest-cov coverage
+              ./$(VENV_DIR)/bin/python -m pytest --cov=. \
+                --cov-report=xml:$(Build.SourcesDirectory)/coverage.xml \
+                --cov-report=html:$(Build.SourcesDirectory)/htmlcov \
+                -v
+            displayName: 'Set up venv, install deps, run tests with coverage'  # This is correct placement
 
           - task: PublishCodeCoverageResults@1
             inputs:
@@ -65,7 +64,7 @@ stages:
               addToPath: true
 
           - script: |
-              echo "MY_VAR is: $(MY_VAR)"  # Print the MY_VAR value
+              echo "MY_VAR is: $(MY_VAR)"
               python -m venv $(VENV_DIR)
               ./$(VENV_DIR)/bin/pip install -r requirements.txt
               ./$(VENV_DIR)/bin/python hello_world.py
