@@ -3,6 +3,7 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 # Azure DevOps Pipeline for Python with Code Coverage
+# Azure DevOps Pipeline for Python with Code Coverage and Artifacts
 
 trigger:
   - main
@@ -31,19 +32,22 @@ stages:
               ./$(VENV_DIR)/bin/pip install --upgrade pip
               ./$(VENV_DIR)/bin/pip install -r requirements.txt
               ./$(VENV_DIR)/bin/pip install pytest pytest-cov coverage
-              ./$(VENV_DIR)/bin/python -m pytest --cov=your_package_name --cov-report=xml --cov-report=html -v
+              ./$(VENV_DIR)/bin/python -m pytest --cov=Pipe-test \
+                --cov-report=xml:$(Build.SourcesDirectory)/coverage.xml \
+                --cov-report=html:$(Build.SourcesDirectory)/htmlcov \
+                -v
             displayName: 'Set up venv, install deps, run tests with coverage'
 
           - task: PublishCodeCoverageResults@1
             inputs:
               codeCoverageTool: 'Cobertura'
-              summaryFileLocation: 'coverage.xml'
-              reportDirectory: 'htmlcov'
+              summaryFileLocation: '$(Build.SourcesDirectory)/coverage.xml'
+              reportDirectory: '$(Build.SourcesDirectory)/htmlcov'
             displayName: 'Publish Code Coverage Results'
 
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: 'htmlcov'
+              PathtoPublish: '$(Build.SourcesDirectory)/htmlcov'
               ArtifactName: 'coverage-report'
               publishLocation: 'Container'
             displayName: 'Publish HTML Coverage Report Artifact'
